@@ -21,7 +21,9 @@ def listarPublicaciones(limite, busqueda):
     if busqueda:
         busqueda_sql = " WHERE publicaciones.titulo LIKE '%"+ busqueda +"%' "
 
-    cursor.execute("select * from publicaciones" + busqueda_sql + limit_sql)        
+    sql = "select * from publicaciones" + busqueda_sql + limit_sql
+
+    cursor.execute(sql)        
     publicaciones = cursor.fetchall()
     
     cursor.execute("SELECT COUNT(*) AS total FROM publicaciones" + busqueda_sql)
