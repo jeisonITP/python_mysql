@@ -19,14 +19,20 @@ def listarPublicaciones(limite, busqueda):
         limit_sql = ' limit ' + limite
         
     if busqueda:
-        busqueda_sql = " WHERE publicaciones.titulo LIKE '%"+ busqueda +"%' "
+        busqueda_sql = " WHERE publicaciones.titulo LIKE '%"+ busqueda +"%' \
+            or publicaciones.fecha_publicacion LIKE '%"+ busqueda +"%' \
+            or usuarios.nombre LIKE '%"+ busqueda +"%' "
 
-    sql = "select * from publicaciones" + busqueda_sql + limit_sql
+    sql = """select publicaciones.*, count(comentarios.id) as cant_comentarios from publicaciones 
+        INNER JOIN usuarios on usuarios.id = publicaciones.usuario_id 
+        LEFT JOIN comentarios on publicaciones.id = comentarios.publicacion_id"""  \
+        + busqueda_sql + ' GROUP BY publicaciones.id ' + ' ORDER BY titulo ASC ' + limit_sql
 
     cursor.execute(sql)        
     publicaciones = cursor.fetchall()
     
-    cursor.execute("SELECT COUNT(*) AS total FROM publicaciones" + busqueda_sql)
+    cursor.execute("SELECT COUNT(*) AS total FROM publicaciones INNER JOIN usuarios on usuarios.id = publicaciones.usuario_id " \
+        + busqueda_sql)
     respuesta_total = cursor.fetchone()
     
     db.commit()
